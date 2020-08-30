@@ -1,11 +1,3 @@
-/** 
- * 
- * 
- * 
- * 
-*/
-
-
 //Create react element and if the children is not an object it will make a default text element
 function createElement(type, props, ...children) {
   return {
@@ -47,6 +39,34 @@ function render(element, container) {
   container.appendChild(domElement);
 };
 
+//Concurrent Mode: breaking the rendering into small units so the browser can interrupt between 
+//              rendering units for anything else it needs to do
+
+
+let nextUnitOfWork = null;
+
+function workLoop(deadline) {
+  let shouldYield = false;
+
+  while (nextUnitOfWork && !shouldYield) {
+    nextUnitOfWork = performUnitOfWork(
+      nextUnitOfWork
+    );
+    shouldYield = deadline.timeRemaining() < 1;
+  };
+  requestIdleCallback(workLoop);
+}
+
+/** 
+ * We use requestIdleCallback to make a loop. 
+ * You can think of requestIdleCallback as a setTimeout, but instead of us telling it when to run, 
+ * the browser will run the callback when the main thread is idle.
+ * */
+requestIdleCallback(workLoop)
+
+function performUnitOfWork(nextUnitOfWork) {
+  // TODO
+}
 
 const MiniReact = {
   createElement,
